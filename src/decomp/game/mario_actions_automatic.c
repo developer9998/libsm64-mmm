@@ -65,8 +65,8 @@ s32 set_pole_position(struct MarioState *m, f32 offsetY) {
     UNUSED s32 unused1;
     UNUSED s32 unused2;
     UNUSED s32 unused3;
-    struct Surface *floor;
-    struct Surface *ceil;
+    struct SM64SurfaceCollisionData *floor;
+    struct SM64SurfaceCollisionData *ceil;
     f32 floorHeight;
     f32 ceilHeight;
     s32 collided;
@@ -307,8 +307,8 @@ s32 act_top_of_pole(struct MarioState *m) {
 
 s32 perform_hanging_step(struct MarioState *m, Vec3f nextPos) {
     UNUSED s32 unused;
-    struct Surface *ceil;
-    struct Surface *floor;
+    struct SM64SurfaceCollisionData *ceil;
+    struct SM64SurfaceCollisionData *floor;
     f32 ceilHeight;
     f32 floorHeight;
     f32 ceilOffset;
@@ -412,8 +412,7 @@ s32 act_start_hanging(struct MarioState *m) {
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
-    //! Crash if Mario's referenced ceiling is NULL (same for other hanging actions)
-    if (m->ceil->type != SURFACE_HANGABLE) {
+    if (m->ceil == NULL || m->ceil->type != SURFACE_HANGABLE) {
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
 
@@ -441,7 +440,7 @@ s32 act_hanging(struct MarioState *m) {
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
-    if (m->ceil->type != SURFACE_HANGABLE) {
+    if (m->ceil == NULL || m->ceil->type != SURFACE_HANGABLE) {
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
 
@@ -465,7 +464,7 @@ s32 act_hang_moving(struct MarioState *m) {
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
 
-    if (m->ceil->type != SURFACE_HANGABLE) {
+    if (m->ceil == NULL || m->ceil->type != SURFACE_HANGABLE) {
         return set_mario_action(m, ACT_FREEFALL, 0);
     }
 
@@ -498,7 +497,7 @@ s32 act_hang_moving(struct MarioState *m) {
 
 s32 let_go_of_ledge(struct MarioState *m) {
     f32 floorHeight;
-    struct Surface *floor;
+    struct SM64SurfaceCollisionData *floor;
 
     m->vel[1] = 0.0f;
     m->forwardVel = -8.0f;
@@ -611,6 +610,8 @@ s32 act_ledge_climb_slow(struct MarioState *m) {
     if (m->input & INPUT_OFF_FLOOR) {
         return let_go_of_ledge(m);
     }
+
+    m->actionTimer++;
 
     if (m->actionTimer >= 28
         && (m->input
@@ -772,7 +773,7 @@ s32 act_in_cannon(struct MarioState *m) {
 }
 
 s32 act_tornado_twirling(struct MarioState *m) {
-    struct Surface *floor;
+    struct SM64SurfaceCollisionData *floor;
     Vec3f nextPos;
     f32 sinAngleVel;
     f32 cosAngleVel;

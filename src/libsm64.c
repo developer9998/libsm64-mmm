@@ -301,6 +301,25 @@ SM64_LIB_FN void sm64_set_mario_health(int32_t marioId, uint16_t health)
     gMarioState->healCounter = 0;
 }
 
+SM64_LIB_FN void sm64_set_mario_water_level(int32_t marioId, signed int level)
+{
+    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
+    {
+        DEBUG_PRINT("Tried to use non-existant Mario with ID: %d", marioId);
+        return;
+    }
+
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->waterLevel = level;
+}
+
+SM64_LIB_FN float sm64_surface_find_water_level(float x, float z)
+{
+    return find_water_level(x, z);
+}
+
 SM64_LIB_FN void sm64_mario_interact_cap( int32_t marioId, uint32_t capFlag, uint16_t capTime)
 {
 	struct GlobalState *globalState = ((struct MarioInstance *)s_mario_instance_pool.objects[ marioId ])->globalState;
@@ -335,13 +354,6 @@ SM64_LIB_FN void sm64_mario_interact_cap( int32_t marioId, uint32_t capFlag, uin
         } else {
             gMarioState->flags |= MARIO_CAP_ON_HEAD;
         }
-
-        //play_sound(SOUND_MENU_STAR_SOUND, gMarioState->marioObj->header.gfx.cameraToObject);
-        //play_sound(SOUND_MARIO_HERE_WE_GO, gMarioState->marioObj->header.gfx.cameraToObject);
-
-        //if (capMusic != 0) {
-        //    play_cap_music(capMusic);
-        //}
 	}
 }
 
