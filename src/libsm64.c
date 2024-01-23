@@ -22,7 +22,7 @@
 #include "decomp/engine/graph_node.h"
 #include "decomp/engine/geo_layout.h"
 #include "decomp/game/rendering_graph_node.h"
-#include "decomp/decomp_mario/geo.inc.h"
+#include "decomp/mario/geo.inc.h"
 #include "decomp/game/platform_displacement.h"
 
 #include "debug_print.h"
