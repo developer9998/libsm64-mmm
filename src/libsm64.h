@@ -4,7 +4,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <seq_ids.h>
 
 #ifdef _WIN32
 #ifdef SM64_LIB_EXPORT
