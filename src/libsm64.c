@@ -230,6 +230,52 @@ SM64_LIB_FN void sm64_mario_delete(int32_t marioId)
     obj_pool_free_index(&s_mario_instance_pool, marioId);
 }
 
+SM64_LIB_FN void sm64_set_mario_position(int32_t marioId, float x, float y, float z)
+{
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->pos[0] = x;
+    gMarioState->pos[1] = y;
+    gMarioState->pos[2] = z;
+    vec3f_copy(gMarioState->marioObj->header.gfx.pos, gMarioState->pos);
+}
+
+SM64_LIB_FN void sm64_set_mario_angle(int32_t marioId, int16_t x, int16_t y, int16_t z)
+{
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    vec3s_set(gMarioState->faceAngle, x, y, z);
+    vec3s_set(gMarioState->marioObj->header.gfx.angle, 0, gMarioState->faceAngle[1], 0);
+}
+
+SM64_LIB_FN void sm64_set_mario_velocity(int32_t marioId, float x, float y, float z)
+{
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->vel[0] = x;
+    gMarioState->vel[1] = y;
+    gMarioState->vel[2] = z;
+}
+
+SM64_LIB_FN void sm64_set_mario_forward_velocity(int32_t marioId, float vel)
+{
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->forwardVel = vel;
+}
+
+SM64_LIB_FN void sm64_set_mario_action(int32_t marioId, uint32_t action)
+{
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    set_mario_action(gMarioState, action, 0);
+}
+
 SM64_LIB_FN void sm64_set_mario_health(int32_t marioId, uint16_t health)
 {
     if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
@@ -244,6 +290,20 @@ SM64_LIB_FN void sm64_set_mario_health(int32_t marioId, uint16_t health)
     gMarioState->health = health;
     gMarioState->hurtCounter = 0;
     gMarioState->healCounter = 0;
+}
+
+SM64_LIB_FN void sm64_set_mario_water_level(int32_t marioId, signed int level)
+{
+    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
+    {
+        DEBUG_PRINT("Tried to set water level of non-existent Mario with ID: %u", marioId);
+        return;
+    }
+
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->waterLevel = level;
 }
 
 SM64_LIB_FN uint32_t sm64_surface_object_create(const struct SM64SurfaceObject* surfaceObject)
