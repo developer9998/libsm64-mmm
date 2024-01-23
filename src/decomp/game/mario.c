@@ -1827,9 +1827,6 @@ int init_mario(void) {
     gMarioState->riddenObj = NULL;
     gMarioState->usedObj = NULL;
 
-    gMarioState->waterLevel =
-        find_water_level(gMarioSpawnInfo->startPos[0], gMarioSpawnInfo->startPos[2]);
-
     gMarioState->area = gCurrentArea;
     gMarioState->marioObj = gMarioObject;
     gMarioState->marioObj->header.gfx.animInfo.animID = -1;

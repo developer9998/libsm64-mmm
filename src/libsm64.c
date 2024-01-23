@@ -171,6 +171,8 @@ SM64_LIB_FN int32_t sm64_mario_create(int16_t x, int16_t y, int16_t z)
         return -1;
     }
 
+    gMarioState->waterLevel = -10000.0f;
+
     set_mario_action(gMarioState, ACT_SPAWN_SPIN_AIRBORNE, 0);
     find_floor(x, y, z, &gMarioState->floor);
 
@@ -368,6 +370,12 @@ SM64_LIB_FN void sm64_set_mario_invincibility(int32_t marioId, int16_t timer)
 
 SM64_LIB_FN void sm64_mario_interact_cap( int32_t marioId, uint32_t capFlag, uint16_t capTime)
 {
+    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
+    {
+        DEBUG_PRINT("Failed to modify cap of a non-existent Mario with ID: %u", marioId);
+        return;
+    }
+
 	struct GlobalState *globalState = ((struct MarioInstance *)s_mario_instance_pool.objects[ marioId ])->globalState;
     global_state_bind( globalState );
 	
@@ -401,6 +409,20 @@ SM64_LIB_FN void sm64_mario_interact_cap( int32_t marioId, uint32_t capFlag, uin
             gMarioState->flags |= MARIO_CAP_ON_HEAD;
         }
 	}
+}
+
+SM64_LIB_FN void sm64_set_mario_water_level(int32_t marioId, signed int level)
+{
+    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
+    {
+        DEBUG_PRINT("Failed to set water level of a non-existent Mario with ID: %u", marioId);
+        return;
+    }
+
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->waterLevel = level;
 }
 
 SM64_LIB_FN uint32_t sm64_surface_object_create(const struct SM64SurfaceObject* surfaceObject)
