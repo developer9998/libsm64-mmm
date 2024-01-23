@@ -24,6 +24,7 @@
 #include "decomp/game/rendering_graph_node.h"
 #include "decomp/mario/geo.inc.h"
 #include "decomp/game/platform_displacement.h"
+#include <seq_ids.h>
 
 #include "debug_print.h"
 #include "load_surfaces.h"
@@ -276,6 +277,14 @@ SM64_LIB_FN void sm64_set_mario_action(int32_t marioId, uint32_t action)
     set_mario_action(gMarioState, action, 0);
 }
 
+SM64_LIB_FN void sm64_set_mario_state(int32_t marioId, uint32_t flags)
+{
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->flags = flags;
+}
+
 SM64_LIB_FN void sm64_set_mario_health(int32_t marioId, uint16_t health)
 {
     if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
@@ -292,18 +301,51 @@ SM64_LIB_FN void sm64_set_mario_health(int32_t marioId, uint16_t health)
     gMarioState->healCounter = 0;
 }
 
-SM64_LIB_FN void sm64_set_mario_water_level(int32_t marioId, signed int level)
+SM64_LIB_FN void sm64_mario_interact_cap( int32_t marioId, uint32_t capFlag, uint16_t capTime)
 {
-    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
-    {
-        DEBUG_PRINT("Tried to set water level of non-existent Mario with ID: %u", marioId);
-        return;
-    }
+	struct GlobalState *globalState = ((struct MarioInstance *)s_mario_instance_pool.objects[ marioId ])->globalState;
+    global_state_bind( globalState );
+	
+	uint16_t capMusic = 0;
+	if(gMarioState->action != ACT_GETTING_BLOWN && capFlag != 0)
+	{
+		gMarioState->flags &= ~MARIO_CAP_ON_HEAD & ~MARIO_CAP_IN_HAND;
+		gMarioState->flags |= capFlag;
+		
+		switch(capFlag)
+		{
+			case MARIO_VANISH_CAP:
+				if(capTime == 0) capTime = 600;
+				capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP);
+				break;
+			case MARIO_METAL_CAP:
+                if(capTime == 0) capTime = 600;
+                capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_METAL_CAP);
+                break;
+            case MARIO_WING_CAP:
+                if(capTime == 0) capTime = 1800;
+                capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP);
+                break;
+		}
+		
+		if (capTime > gMarioState->capTimer) {
+            gMarioState->capTimer = capTime;
+        }
+		
+		if ((gMarioState->action & ACT_FLAG_IDLE) || gMarioState->action == ACT_WALKING) {
+            gMarioState->flags |= MARIO_CAP_IN_HAND;
+            set_mario_action(gMarioState, ACT_PUTTING_ON_CAP, 0);
+        } else {
+            gMarioState->flags |= MARIO_CAP_ON_HEAD;
+        }
 
-    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
-    global_state_bind(globalState);
+        play_sound(SOUND_MENU_STAR_SOUND, gMarioState->marioObj->header.gfx.cameraToObject);
+        play_sound(SOUND_MARIO_HERE_WE_GO, gMarioState->marioObj->header.gfx.cameraToObject);
 
-    gMarioState->waterLevel = level;
+        if (capMusic != 0) {
+            play_cap_music(capMusic);
+        }
+	}
 }
 
 SM64_LIB_FN uint32_t sm64_surface_object_create(const struct SM64SurfaceObject* surfaceObject)
