@@ -398,7 +398,7 @@ FodyWeavers.xsd
 *.sln.iml
 
 # wahoo
-/src/decomp/mario
+/src/decomp/decomp_mario
 /build/
 /dist/
 /test/level.c
