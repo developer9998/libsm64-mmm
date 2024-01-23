@@ -609,7 +609,7 @@ void push_mario_out_of_object(struct MarioState *m, struct Object *o, f32 paddin
     f32 distance = sqrtf(offsetX * offsetX + offsetZ * offsetZ);
 
     if (distance < minDistance) {
-        struct SM64SurfaceCollisionData *floor;
+        struct Surface *floor;
         s16 pushAngle;
         f32 newMarioX;
         f32 newMarioZ;
