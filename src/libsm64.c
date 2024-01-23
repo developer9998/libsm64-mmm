@@ -24,7 +24,7 @@
 #include "decomp/game/rendering_graph_node.h"
 #include "decomp/mario/geo.inc.h"
 #include "decomp/game/platform_displacement.h"
-#include <seq_ids.h>
+#include "decomp/include/seq_ids.h"
 
 #include "debug_print.h"
 #include "load_surfaces.h"
