@@ -10,7 +10,7 @@
 
 static s16 sMovingSandSpeeds[] = { 12, 8, 4, 0 };
 
-struct SM64SurfaceCollisionData gWaterSurfacePseudoFloor = {
+struct Surface gWaterSurfacePseudoFloor = {
     SURFACE_VERY_SLIPPERY, 0,    0,    0, 0, 0, { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 },
     { 0.0f, 1.0f, 0.0f },  0.0f, 0, NULL, 0
 };
@@ -169,7 +169,7 @@ u32 mario_push_off_steep_floor(struct MarioState *m, u32 action, u32 actionArg) 
 }
 
 u32 mario_update_moving_sand(struct MarioState *m) {
-    struct SM64SurfaceCollisionData *floor = m->floor;
+    struct Surface *floor = m->floor;
     s32 floorType = floor->type;
 
     if (floorType == SURFACE_DEEP_MOVING_QUICKSAND || floorType == SURFACE_SHALLOW_MOVING_QUICKSAND
@@ -187,7 +187,7 @@ u32 mario_update_moving_sand(struct MarioState *m) {
 }
 
 u32 mario_update_windy_ground(struct MarioState *m) {
-    struct SM64SurfaceCollisionData *floor = m->floor;
+    struct Surface *floor = m->floor;
 
     if (floor->type == SURFACE_HORIZONTAL_WIND) {
         f32 pushSpeed;
@@ -255,10 +255,10 @@ s32 stationary_ground_step(struct MarioState *m) {
 }
 
 static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
-    UNUSED struct SM64SurfaceCollisionData *lowerWall;
-    struct SM64SurfaceCollisionData *upperWall;
-    struct SM64SurfaceCollisionData *ceil;
-    struct SM64SurfaceCollisionData *floor;
+    UNUSED struct Surface *lowerWall;
+    struct Surface *upperWall;
+    struct Surface *ceil;
+    struct Surface *floor;
     f32 ceilHeight;
     f32 floorHeight;
     f32 waterLevel;
@@ -269,8 +269,7 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     ceilHeight = vec3f_find_ceil(nextPos, floorHeight, &ceil);
 
-    //waterLevel = find_water_level(nextPos[0], nextPos[2]);
-    waterLevel = m->waterLevel;
+    waterLevel = find_water_level(nextPos[0], nextPos[2]);
 
     m->wall = upperWall;
 
@@ -345,8 +344,8 @@ s32 perform_ground_step(struct MarioState *m) {
     return stepResult;
 }
 
-u32 check_ledge_grab(struct MarioState *m, struct SM64SurfaceCollisionData *wall, Vec3f intendedPos, Vec3f nextPos) {
-    struct SM64SurfaceCollisionData *ledgeFloor;
+u32 check_ledge_grab(struct MarioState *m, struct Surface *wall, Vec3f intendedPos, Vec3f nextPos) {
+    struct Surface *ledgeFloor;
     Vec3f ledgePos;
     f32 displacementX;
     f32 displacementZ;
@@ -388,10 +387,10 @@ u32 check_ledge_grab(struct MarioState *m, struct SM64SurfaceCollisionData *wall
 s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepArg) {
     s16 wallDYaw;
     Vec3f nextPos;
-    struct SM64SurfaceCollisionData *upperWall;
-    struct SM64SurfaceCollisionData *lowerWall;
-    struct SM64SurfaceCollisionData *ceil;
-    struct SM64SurfaceCollisionData *floor;
+    struct Surface *upperWall;
+    struct Surface *lowerWall;
+    struct Surface *ceil;
+    struct Surface *floor;
     f32 ceilHeight;
     f32 floorHeight;
     f32 waterLevel;
@@ -404,8 +403,7 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
     floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     ceilHeight = vec3f_find_ceil(nextPos, floorHeight, &ceil);
 
-    //waterLevel = find_water_level(nextPos[0], nextPos[2]);
-    waterLevel = m->waterLevel;
+    waterLevel = find_water_level(nextPos[0], nextPos[2]);
 
     m->wall = NULL;
 
