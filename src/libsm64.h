@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <seq_ids.h>
 
 #ifdef _WIN32
 #ifdef SM64_LIB_EXPORT
@@ -85,7 +86,7 @@ extern SM64_LIB_FN void sm64_set_mario_angle(int32_t marioId, int16_t x, int16_t
 extern SM64_LIB_FN void sm64_set_mario_velocity(int32_t marioId, float x, float y, float z);
 extern SM64_LIB_FN void sm64_set_mario_forward_velocity(int32_t marioId, float vel);
 extern SM64_LIB_FN void sm64_set_mario_health(int32_t marioId, uint16_t health);
-extern SM64_LIB_FN void sm64_mario_interact_cap(int32_t marioId, uint32_t capFlag, uint16_t capTime, uint8_t playMusic);
+extern SM64_LIB_FN void sm64_mario_interact_cap(int32_t marioId, uint32_t capFlag, uint16_t capTime);
 
 extern SM64_LIB_FN uint32_t sm64_surface_object_create(const struct SM64SurfaceObject* surfaceObject);
 extern SM64_LIB_FN void sm64_surface_object_move(uint32_t objectId, const struct SM64ObjectTransform* transform);
