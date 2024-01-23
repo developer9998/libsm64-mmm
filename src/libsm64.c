@@ -128,7 +128,7 @@ SM64_LIB_FN void sm64_static_surfaces_load(const struct SM64Surface* surfaceArra
     surfaces_load_static(surfaceArray, numSurfaces);
 }
 
-SM64_LIB_FN int32_t sm64_mario_create(int16_t x, int16_t y, int16_t z)
+SM64_LIB_FN int32_t sm64_mario_create(int16_t x, int16_t y, int16_t z, int16_t rx, int16_t ry, int16_t rz)
 {
     int32_t marioIndex = obj_pool_alloc_index(&s_mario_instance_pool, sizeof(struct MarioInstance));
     struct MarioInstance* newInstance = s_mario_instance_pool.objects[marioIndex];
@@ -152,9 +152,9 @@ SM64_LIB_FN int32_t sm64_mario_create(int16_t x, int16_t y, int16_t z)
     gMarioSpawnInfoVal.startPos[1] = y;
     gMarioSpawnInfoVal.startPos[2] = z;
 
-    gMarioSpawnInfoVal.startAngle[0] = 0;
-    gMarioSpawnInfoVal.startAngle[1] = 0;
-    gMarioSpawnInfoVal.startAngle[2] = 0;
+    gMarioSpawnInfoVal.startAngle[0] = rx;
+    gMarioSpawnInfoVal.startAngle[1] = ry;
+    gMarioSpawnInfoVal.startAngle[2] = rz;
 
     gMarioSpawnInfoVal.areaIndex = 0;
     gMarioSpawnInfoVal.activeAreaIndex = 0;
