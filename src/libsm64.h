@@ -6,13 +6,13 @@
 #include <stdbool.h>
 
 #ifdef _WIN32
-    #ifdef SM64_LIB_EXPORT
-        #define SM64_LIB_FN __declspec(dllexport)
-    #else
-        #define SM64_LIB_FN __declspec(dllimport)
-    #endif
+#ifdef SM64_LIB_EXPORT
+#define SM64_LIB_FN __declspec(dllexport)
 #else
-    #define SM64_LIB_FN
+#define SM64_LIB_FN __declspec(dllimport)
+#endif
+#else
+#define SM64_LIB_FN
 #endif
 
 struct SM64Surface
@@ -40,7 +40,7 @@ struct SM64SurfaceObject
 {
     struct SM64ObjectTransform transform;
     uint32_t surfaceCount;
-    struct SM64Surface *surfaces;
+    struct SM64Surface* surfaces;
 };
 
 struct SM64MarioState
@@ -53,14 +53,14 @@ struct SM64MarioState
 
 struct SM64MarioGeometryBuffers
 {
-    float *position;
-    float *normal;
-    float *color;
-    float *uv;
+    float* position;
+    float* normal;
+    float* color;
+    float* uv;
     uint16_t numTrianglesUsed;
 };
 
-typedef void (*SM64DebugPrintFunctionPtr)( const char * );
+typedef void (*SM64DebugPrintFunctionPtr)(const char*);
 
 enum
 {
@@ -69,17 +69,19 @@ enum
     SM64_GEO_MAX_TRIANGLES = 1024,
 };
 
-extern SM64_LIB_FN void sm64_global_init( uint8_t *rom, uint8_t *outTexture, SM64DebugPrintFunctionPtr debugPrintFunction );
-extern SM64_LIB_FN void sm64_global_terminate( void );
+extern SM64_LIB_FN void sm64_global_init(uint8_t* rom, uint8_t* outTexture, SM64DebugPrintFunctionPtr debugPrintFunction);
+extern SM64_LIB_FN void sm64_global_terminate(void);
 
-extern SM64_LIB_FN void sm64_static_surfaces_load( const struct SM64Surface *surfaceArray, uint32_t numSurfaces );
+extern SM64_LIB_FN void sm64_static_surfaces_load(const struct SM64Surface* surfaceArray, uint32_t numSurfaces);
 
-extern SM64_LIB_FN int32_t sm64_mario_create( int16_t x, int16_t y, int16_t z );
-extern SM64_LIB_FN void sm64_mario_tick( int32_t marioId, const struct SM64MarioInputs *inputs, struct SM64MarioState *outState, struct SM64MarioGeometryBuffers *outBuffers );
-extern SM64_LIB_FN void sm64_mario_delete( int32_t marioId );
+extern SM64_LIB_FN int32_t sm64_mario_create(int16_t x, int16_t y, int16_t z);
+extern SM64_LIB_FN void sm64_mario_tick(int32_t marioId, const struct SM64MarioInputs* inputs, struct SM64MarioState* outState, struct SM64MarioGeometryBuffers* outBuffers);
+extern SM64_LIB_FN void sm64_mario_delete(int32_t marioId);
 
-extern SM64_LIB_FN uint32_t sm64_surface_object_create( const struct SM64SurfaceObject *surfaceObject );
-extern SM64_LIB_FN void sm64_surface_object_move( uint32_t objectId, const struct SM64ObjectTransform *transform );
-extern SM64_LIB_FN void sm64_surface_object_delete( uint32_t objectId );
+extern SM64_LIB_FN void sm64_set_mario_health(int32_t marioId, uint16_t health);
+
+extern SM64_LIB_FN uint32_t sm64_surface_object_create(const struct SM64SurfaceObject* surfaceObject);
+extern SM64_LIB_FN void sm64_surface_object_move(uint32_t objectId, const struct SM64ObjectTransform* transform);
+extern SM64_LIB_FN void sm64_surface_object_delete(uint32_t objectId);
 
 #endif//LIB_SM64_H
