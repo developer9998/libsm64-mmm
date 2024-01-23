@@ -280,7 +280,7 @@ SM64_LIB_FN void sm64_set_mario_angle(int32_t marioId, int16_t x, int16_t y, int
 {
     if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
     {
-        DEBUG_PRINT("Failed to set angle of a non-existent Mario with ID: %u", marioId);
+        DEBUG_PRINT("Failed to set rotation (via. angle) of a non-existent Mario with ID: %u", marioId);
         return;
     }
 
@@ -288,6 +288,21 @@ SM64_LIB_FN void sm64_set_mario_angle(int32_t marioId, int16_t x, int16_t y, int
     global_state_bind(globalState);
 
     vec3s_set(gMarioState->faceAngle, x, y, z);
+    vec3s_set(gMarioState->marioObj->header.gfx.angle, 0, gMarioState->faceAngle[1], 0);
+}
+
+SM64_LIB_FN void sm64_set_mario_faceangle(int32_t marioId, float y)
+{
+    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
+    {
+        DEBUG_PRINT("Failed to set rotation (via. faceangle) of a non-existent Mario with ID: %u", marioId);
+        return;
+    }
+
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->faceAngle[1] = (int16_t)(y / 3.14159f * 32768.f);
     vec3s_set(gMarioState->marioObj->header.gfx.angle, 0, gMarioState->faceAngle[1], 0);
 }
 
