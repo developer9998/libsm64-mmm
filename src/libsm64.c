@@ -338,6 +338,20 @@ SM64_LIB_FN void sm64_set_mario_forward_velocity(int32_t marioId, float vel)
     gMarioState->forwardVel = vel;
 }
 
+SM64_LIB_FN void sm64_set_mario_upward_velocity(int32_t marioId, float vel)
+{
+    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
+    {
+        DEBUG_PRINT("Failed to set upwards velocity of a non-existent Mario with ID: %u", marioId);
+        return;
+    }
+
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->vel[1] = vel;
+}
+
 SM64_LIB_FN void sm64_set_mario_health(int32_t marioId, uint16_t health)
 {
     if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
