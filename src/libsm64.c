@@ -316,15 +316,12 @@ SM64_LIB_FN void sm64_mario_interact_cap( int32_t marioId, uint32_t capFlag, uin
 		{
 			case MARIO_VANISH_CAP:
 				if(capTime == 0) capTime = 600;
-				capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP);
 				break;
 			case MARIO_METAL_CAP:
                 if(capTime == 0) capTime = 600;
-                capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_METAL_CAP);
                 break;
             case MARIO_WING_CAP:
                 if(capTime == 0) capTime = 1800;
-                capMusic = SEQUENCE_ARGS(4, SEQ_EVENT_POWERUP);
                 break;
 		}
 		
@@ -339,12 +336,12 @@ SM64_LIB_FN void sm64_mario_interact_cap( int32_t marioId, uint32_t capFlag, uin
             gMarioState->flags |= MARIO_CAP_ON_HEAD;
         }
 
-        play_sound(SOUND_MENU_STAR_SOUND, gMarioState->marioObj->header.gfx.cameraToObject);
-        play_sound(SOUND_MARIO_HERE_WE_GO, gMarioState->marioObj->header.gfx.cameraToObject);
+        //play_sound(SOUND_MENU_STAR_SOUND, gMarioState->marioObj->header.gfx.cameraToObject);
+        //play_sound(SOUND_MARIO_HERE_WE_GO, gMarioState->marioObj->header.gfx.cameraToObject);
 
-        if (capMusic != 0) {
-            play_cap_music(capMusic);
-        }
+        //if (capMusic != 0) {
+        //    play_cap_music(capMusic);
+        //}
 	}
 }
 
