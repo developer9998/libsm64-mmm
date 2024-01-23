@@ -7,7 +7,7 @@
 #include "../include/sm64.h"
 
 #include "area.h"
-// #include "audio/external.h"
+#include "../audio/external.h"
 // #include "behavior_actions.h"
 // #include "behavior_data.h"
 #include "camera.h"
@@ -527,9 +527,9 @@ u32 mario_get_terrain_sound_addend(struct MarioState *m) {
 /**
  * Collides with walls and returns the most recent wall.
  */
-struct Surface *resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius) {
-    struct WallCollisionData collisionData;
-    struct Surface *wall = NULL;
+struct SM64SurfaceCollisionData *resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 radius) {
+    struct SM64WallCollisionData collisionData;
+    struct SM64SurfaceCollisionData *wall = NULL;
 
     collisionData.x = pos[0];
     collisionData.y = pos[1];
@@ -553,7 +553,7 @@ struct Surface *resolve_and_return_wall_collisions(Vec3f pos, f32 offset, f32 ra
 /**
  * Finds the ceiling from a vec3f horizontally and a height (with 80 vertical buffer).
  */
-f32 vec3f_find_ceil(Vec3f pos, f32 height, struct Surface **ceil) {
+f32 vec3f_find_ceil(Vec3f pos, f32 height, struct SM64SurfaceCollisionData **ceil) {
     UNUSED f32 unused;
 
     return find_ceil(pos[0], height + 80.0f, pos[2], ceil);
@@ -681,7 +681,7 @@ s32 mario_floor_is_steep(struct MarioState *m) {
  * Finds the floor height relative from Mario given polar displacement.
  */
 f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f32 distFromMario) {
-    struct Surface *floor;
+    struct SM64SurfaceCollisionData *floor;
     f32 floorY;
 
     f32 y = sins(m->faceAngle[1] + angleFromMario) * distFromMario;
@@ -696,7 +696,7 @@ f32 find_floor_height_relative_polar(struct MarioState *m, s16 angleFromMario, f
  * Returns the slope of the floor based off points around Mario.
  */
 s16 find_floor_slope(struct MarioState *m, s16 yawOffset) {
-    struct Surface *floor;
+    struct SM64SurfaceCollisionData *floor;
     f32 forwardFloorY, backwardFloorY;
     f32 forwardYDelta, backwardYDelta;
     s16 result;
@@ -1321,7 +1321,7 @@ void update_mario_joystick_inputs(struct MarioState *m) {
  * Resolves wall collisions, and updates a variety of inputs.
  */
 void update_mario_geometry_inputs(struct MarioState *m) {
-    f32 gasLevel;
+    //f32 gasLevel;
     f32 ceilToFloorDist;
 
     f32_find_wall_collision(&m->pos[0], &m->pos[1], &m->pos[2], 60.0f, 50.0f);
@@ -1329,7 +1329,9 @@ void update_mario_geometry_inputs(struct MarioState *m) {
 
     m->floorHeight = find_floor(m->pos[0], m->pos[1], m->pos[2], &m->floor);
 
-    m->curTerrain = m->floor->terrain;
+	if(m->floor != NULL) {
+		m->curTerrain = m->floor->terrain;
+	}
 
     // If Mario is OOB, move his position to his graphical position (which was not updated)
     // and check for the floor there.
@@ -1341,8 +1343,8 @@ void update_mario_geometry_inputs(struct MarioState *m) {
     }
 
     m->ceilHeight = vec3f_find_ceil(&m->pos[0], m->floorHeight, &m->ceil);
-    gasLevel = find_poison_gas_level(m->pos[0], m->pos[2]);
-    m->waterLevel = find_water_level(m->pos[0], m->pos[2]);
+    //gasLevel = find_poison_gas_level(m->pos[0], m->pos[2]);
+    //m->waterLevel = find_water_level(m->pos[0], m->pos[2]);
 
     if (m->floor != NULL) {
         m->floorAngle = atan2s(m->floor->normal.z, m->floor->normal.x);
@@ -1369,7 +1371,7 @@ void update_mario_geometry_inputs(struct MarioState *m) {
             m->input |= INPUT_IN_WATER;
         }
 
-        if (m->pos[1] < (gasLevel - 100.0f)) {
+        if (m->pos[1] < (m->gasLevel - 100.0f)) {
             m->input |= INPUT_IN_POISON_GAS;
         }
 
@@ -1827,13 +1829,18 @@ int init_mario(void) {
     gMarioState->riddenObj = NULL;
     gMarioState->usedObj = NULL;
 
+    gMarioState->waterLevel =
+        find_water_level(gMarioSpawnInfo->startPos[0], gMarioSpawnInfo->startPos[2]);
+    gMarioState->gasLevel =
+        find_poison_gas_level(gMarioSpawnInfo->startPos[0], gMarioSpawnInfo->startPos[2]);
+
     gMarioState->area = gCurrentArea;
     gMarioState->marioObj = gMarioObject;
     gMarioState->marioObj->header.gfx.animInfo.animID = -1;
 
     vec3s_copy(gMarioState->faceAngle, gMarioSpawnInfo->startAngle);
     vec3s_set(gMarioState->angleVel, 0, 0, 0);
-    vec3s_to_vec3f(gMarioState->pos, gMarioSpawnInfo->startPos);
+    vec3f_copy(gMarioState->pos, gMarioSpawnInfo->startPos);
     vec3f_set(gMarioState->vel, 0, 0, 0);
 
     gMarioState->floorHeight =
