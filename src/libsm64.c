@@ -382,48 +382,6 @@ SM64_LIB_FN void sm64_set_mario_invincibility(int32_t marioId, int16_t timer)
     gMarioState->invincTimer = timer;
 }
 
-SM64_LIB_FN void sm64_mario_interact_cap( int32_t marioId, uint32_t capFlag, uint16_t capTime)
-{
-    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
-    {
-        DEBUG_PRINT("Failed to modify cap of a non-existent Mario with ID: %u", marioId);
-        return;
-    }
-
-	struct GlobalState *globalState = ((struct MarioInstance *)s_mario_instance_pool.objects[ marioId ])->globalState;
-    global_state_bind( globalState );
-	
-	if(gMarioState->action != ACT_GETTING_BLOWN && capFlag != 0)
-	{
-		gMarioState->flags &= ~MARIO_CAP_ON_HEAD & ~MARIO_CAP_IN_HAND;
-		gMarioState->flags |= capFlag;
-		
-		switch(capFlag)
-		{
-			case MARIO_VANISH_CAP:
-				if(capTime == 0) capTime = 600;
-				break;
-			case MARIO_METAL_CAP:
-                if(capTime == 0) capTime = 600;
-                break;
-            case MARIO_WING_CAP:
-                if(capTime == 0) capTime = 1800;
-                break;
-		}
-		
-		if (capTime > gMarioState->capTimer) {
-            gMarioState->capTimer = capTime;
-        }
-		
-		if ((gMarioState->action & ACT_FLAG_IDLE) || gMarioState->action == ACT_WALKING) {
-            gMarioState->flags |= MARIO_CAP_IN_HAND;
-            set_mario_action(gMarioState, ACT_PUTTING_ON_CAP, 0);
-        } else {
-            gMarioState->flags |= MARIO_CAP_ON_HEAD;
-        }
-	}
-}
-
 SM64_LIB_FN void sm64_set_mario_water_level(int32_t marioId, signed int level)
 {
     if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
@@ -436,6 +394,77 @@ SM64_LIB_FN void sm64_set_mario_water_level(int32_t marioId, signed int level)
     global_state_bind(globalState);
 
     gMarioState->waterLevel = level;
+}
+
+SM64_LIB_FN void sm64_mario_kill(int32_t marioId)
+{
+    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
+    {
+        DEBUG_PRINT("Failed to kill a non-existent Mario with ID: %u", marioId);
+        return;
+    }
+
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    gMarioState->health = 0xff;
+}
+
+SM64_LIB_FN void sm64_mario_interact_cap(int32_t marioId, uint32_t capFlag, uint16_t capTime)
+{
+    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
+    {
+        DEBUG_PRINT("Failed to modify cap of a non-existent Mario with ID: %u", marioId);
+        return;
+    }
+
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    if (gMarioState->action != ACT_GETTING_BLOWN && capFlag != 0)
+    {
+        gMarioState->flags &= ~MARIO_CAP_ON_HEAD & ~MARIO_CAP_IN_HAND;
+        gMarioState->flags |= capFlag;
+
+        switch (capFlag)
+        {
+        case MARIO_VANISH_CAP:
+            if (capTime == 0) capTime = 600;
+            break;
+        case MARIO_METAL_CAP:
+            if (capTime == 0) capTime = 600;
+            break;
+        case MARIO_WING_CAP:
+            if (capTime == 0) capTime = 1800;
+            break;
+        }
+
+        if (capTime > gMarioState->capTimer) {
+            gMarioState->capTimer = capTime;
+        }
+
+        if ((gMarioState->action & ACT_FLAG_IDLE) || gMarioState->action == ACT_WALKING) {
+            gMarioState->flags |= MARIO_CAP_IN_HAND;
+            set_mario_action(gMarioState, ACT_PUTTING_ON_CAP, 0);
+        }
+        else {
+            gMarioState->flags |= MARIO_CAP_ON_HEAD;
+        }
+    }
+}
+
+extern SM64_LIB_FN int16_t sm64_get_mario_health(int32_t marioId) 
+{
+    if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
+    {
+        DEBUG_PRINT("Failed to get health of a non-existent Mario with ID: %u", marioId);
+        return NULL;
+    }
+
+    struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
+    global_state_bind(globalState);
+
+    return gMarioState->health;
 }
 
 SM64_LIB_FN uint32_t sm64_surface_object_create(const struct SM64SurfaceObject* surfaceObject)
