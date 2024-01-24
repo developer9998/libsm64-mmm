@@ -393,7 +393,6 @@ SM64_LIB_FN void sm64_mario_interact_cap( int32_t marioId, uint32_t capFlag, uin
 	struct GlobalState *globalState = ((struct MarioInstance *)s_mario_instance_pool.objects[ marioId ])->globalState;
     global_state_bind( globalState );
 	
-	uint16_t capMusic = 0;
 	if(gMarioState->action != ACT_GETTING_BLOWN && capFlag != 0)
 	{
 		gMarioState->flags &= ~MARIO_CAP_ON_HEAD & ~MARIO_CAP_IN_HAND;
