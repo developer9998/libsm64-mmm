@@ -458,7 +458,7 @@ extern SM64_LIB_FN int16_t sm64_get_mario_health(int32_t marioId)
     if (marioId >= s_mario_instance_pool.size || s_mario_instance_pool.objects[marioId] == NULL)
     {
         DEBUG_PRINT("Failed to get health of a non-existent Mario with ID: %u", marioId);
-        return NULL;
+        return 0xff;
     }
 
     struct GlobalState* globalState = ((struct MarioInstance*)s_mario_instance_pool.objects[marioId])->globalState;
